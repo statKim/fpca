@@ -1,0 +1,3 @@
+#useDynLib(fpca)
+export(fpca.mle)
+import(sm,splines)
