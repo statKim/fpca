@@ -49,12 +49,21 @@ EMeigen.est <- EMeigenmat%*% diag(1/sqrt(diag(t(EMeigenmat)%*%EMeigenmat))) ### 
 
 ## (c) Crude ''estimated'' of eigenvalues from normalization
 EMDinv <- EMest$alpha[[3]]  ## estimate of D^{-1} from EM algorithm
-EMgamma <- EMeigenmat %*% solve(EMDinv) %*% t(EMeigenmat)
+##EMgamma <- EMeigenmat %*% solve(EMDinv) %*% t(EMeigenmat)
+EMgamma <- EMeigenmat %*% solve(EMDinv, t(EMeigenmat))
 ### estimate of Gamma
-EMgamma.svd <- svd(EMgamma)  ## svd of Gamma (* length(grid))
-EMeigenvec.est <- EMgamma.svd$u[,1:r.EM]
+
+####EMgamma.svd <- svd(EMgamma)  ## svd of Gamma (* length(grid))
+####EMeigenvec.est <- EMgamma.svd$u[,1:r.EM]
 ### first r.EM eigenvectors of Gamma
-EMeigenval.est <- EMgamma.svd$d[1:r.EM]/length(grids)
+#####EMeigenval.est <- EMgamma.svd$d[1:r.EM]/length(grids)
+
+
+EMgamma.svd <- eigen(EMgamma,symmetric=TRUE)     ###use eigen with symmetric=TRUE
+### first r.EM eigenvectors of Gamma
+EMeigenval.est <- EMgamma.svd$values[1:r.EM]/length(grids)
+### first r.EM eigenvectors of Gamma
+EMeigenvec.est <- EMgamma.svd$vectors[,1:r.EM]
 ### estimated eigenvalues
 EMsigma.est = sqrt(EMest$sigma)   ##estimated sigma
 
@@ -81,9 +90,9 @@ calclike <- function(y, sigma, Dinv, theta, B, curve){
       N <- length(table(curve))	
       for(i in 1:N){       
            X <- B[curve == i, ] %*% theta		
-           C.my <- X %*% solve(Dinv) %*% t(X) + sigma * diag(dim(X)[1])
+           C.my <- X %*% solve(Dinv, t(X)) + sigma * diag(dim(X)[1])
            C.my<-(C.my+t(C.my))/2 
-      like <- like - t(y[curve == i]) %*% solve(C.my) %*% y[curve == i]/2 - sum(logb(eigen(C.my,symmetric=T)$value))/2	
+      like <- like - t(y[curve == i]) %*% solve(C.my, y[curve == i])/2 - sum(logb(eigen(C.my,symmetric=TRUE, only.values=TRUE)$value))/2	
       }
 #     print(paste("Like =", like) 
       return(like)
@@ -131,7 +140,7 @@ fpcaEM <- function(obj, k = 2, df = 5, grid = seq(0.01, 1, length = 100), maxit 
      R.old <- 0    
      R.new <- 1   
      ind <- 1  
-     theta.zero <- solve(t(B) %*% B) %*% t(B) %*% y 
+     theta.zero <- solve(t(B) %*% B, t(B)) %*% y 
      y <- y - B %*% theta.zero  
 
      alpha <- list(alpha = matrix(1, N, k), alphaprod = array(1, c(N, k, k)))   
@@ -202,7 +211,7 @@ getemtheta <- function(y, curve, alphaobj, B, theta, tol = 0.0001){
                ind[j] <- 0       
                tempy <- alpha[curve, j] * y - ((B %*% theta) * alphaprod[curve,  ,  j]) %*% ind   
                tempX <- B * sqrt(alphaprod[curve, j, j])      
-               theta[, j] <- solve(t(tempX) %*% tempX) %*% t(B) %*% tempy		   
+               theta[, j] <- solve(t(tempX) %*% tempX, t(B)) %*% tempy		   
            }    
            R.old <- R.new  
            R.new <- sum((y - ((B %*% theta) * alpha[curve,  ]) %*% rep(1, k))^2)
@@ -241,7 +250,7 @@ init <- function(y, timeindex, curve, B, k, pert = 0){
       for(i in 1:N) {
          X <- B[(s[i] + 1):s[i + 1],  ]  
          tempy <- y[(s[i] + 1):s[i + 1]]     
-         gamma[i,  ] <- solve(t(X) %*% X + pert * diag(q)) %*% t(X) %*% tempy
+         gamma[i,  ] <- solve(t(X) %*% X + pert * diag(q), t(X)) %*% tempy
       }	
       theta <- prcomp(gamma)$rotation[, 1:k]
       result = list(theta = theta, gamma = gamma)

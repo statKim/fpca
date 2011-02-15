@@ -80,7 +80,7 @@ BC.basis.orth<-function(knots,grids){
 bs<-apply(matrix(grids),1,BC.basis,knots=knots)
 temp<-bs%*%t(bs)*(grids[2]-grids[1])
 R<-t(chol(temp))
-result<-solve(R)%*%bs
+result<-solve(R, bs)
 return(list(result,R))
 }
 
@@ -209,7 +209,7 @@ Proj.Ini<-function(covmatrix,M,r,basis.method,grids){
  }
 ##
  H<-Proj.basis.surf(covmatrix,bs, delta=grids[2]-grids[1])
- eigenH<-eigen(H)
+ eigenH<-eigen(H,symmetric=TRUE)
  lam.loc<-eigenH$values[1:r]
  B.loc<-eigenH$vectors[,1:r]
  eigen.est2<-t(bs%*%B.loc)

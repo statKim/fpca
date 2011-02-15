@@ -67,7 +67,7 @@ n<-length(data.list)    ##number of subjects
   
  ## (iv)estimate mean and substract
   #library(sm) 
-  temp<-LocLin.mean(data.list.new,n,nmax)  ##subtract estimated mean
+  temp<-LocLin.mean(data.list.new,n,nmax, grids)  ##subtract estimated mean
   data.list.new<-temp[[1]]
   fitmu<-temp[[2]]
 
@@ -133,8 +133,14 @@ n<-length(data.list)    ##number of subjects
 }
 
 
+                        
 
 
+
+
+
+
+####################################################
 ############################ internal functions
 ##name:fpca.fit
 ##purpose: for a given dataset which is formatted in the form of data.list (e.g., by function fpca.format), 
@@ -441,8 +447,5 @@ count<-1
 
 require("sm")
 require("splines")
-
-
-
 
 

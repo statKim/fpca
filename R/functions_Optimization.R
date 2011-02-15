@@ -314,7 +314,7 @@ Update.Lambda<-function(B,phi.aux,sig,Lambda,data.list,n,epsi=1e-6){
    gradF.c<-gradF[-1]
    Hess.c<-Hess[-1,-1]
   
-   eigen.H<-eigen(Hess.c)
+   eigen.H<-eigen(Hess.c,symmetric=TRUE)
    U.H<-eigen.H$vectors
    D.H<-eigen.H$values
    H.inv<-U.H%*%diag(1/D.H)%*%t(U.H)
@@ -324,7 +324,7 @@ Update.Lambda<-function(B,phi.aux,sig,Lambda,data.list,n,epsi=1e-6){
    sig.c<-sig
 
   }else{   
-   eigen.H<-eigen(Hess)
+   eigen.H<-eigen(Hess,symmetric=TRUE)
    U.H<-eigen.H$vectors
    D.H<-eigen.H$values
    H.inv<-U.H%*%diag(1/D.H)%*%t(U.H)
@@ -482,7 +482,7 @@ loglike.cov<-function(covmatrix,sig,data.list,i){
  
   P<-sig^2*diag(1,m)+covmatrix[timeindex,timeindex]
   
-  temp1<-solve(P)%*%y%*%t(y)
+  temp1<-solve(P,y)%*%t(y)
   temp1<-sum(diag(temp1))
   temp2<-log(det(P))
 
@@ -587,7 +587,7 @@ CV.Lambda<-function(B,phi.aux,sig,Lambda,data.list,n){
  temp.all<-matrix(temp.all,r+1,r+2) 
  Hess.all<-temp.all[,-1] 
 
-  eigen.H<-eigen(Hess.all)
+  eigen.H<-eigen(Hess.all,symmetric=TRUE)
   U.H<-eigen.H$vectors
   D.H<-eigen.H$values
   Hess.inv<-U.H%*%diag(1/D.H)%*%t(U.H) 
