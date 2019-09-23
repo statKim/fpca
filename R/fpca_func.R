@@ -120,8 +120,10 @@ fpca.mle<-function(data.m, M.set,r.set,ini.method="EM", basis.method="bs",sl.v=r
   eigenv<-result.sele$eigenval
   eigenv.sele<-eigenv[1,,index.M]
   
-  PVE <- data.frame(result.sele$PVE)[index.M, ]
+  PVE <- rbind(data.frame(result.sele$PVE)[index.M, ],
+               t(apply(data.frame(result.sele$PVE)[index.M, ], 1, cumsum)))
   colnames(PVE) <- paste("PC", 1:r.set[index.r], sep="")
+  rownames(PVE) <- c("Individual","Cumulative")
   
   sig<-result.sele$sig
   sig.sele<-sig[1,index.M]
