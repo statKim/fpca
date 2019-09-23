@@ -120,7 +120,7 @@ fpca.mle<-function(data.m, M.set,r.set,ini.method="EM", basis.method="bs",sl.v=r
   eigenv<-result.sele$eigenval
   eigenv.sele<-eigenv[1,,index.M]
   
-  PVE <- data.frame(result.sele$PVE)
+  PVE <- data.frame(result.sele$PVE)[index.M, ]
   colnames(PVE) <- paste("PC", 1:r.set[index.r], sep="")
   
   sig<-result.sele$sig
@@ -132,7 +132,7 @@ fpca.mle<-function(data.m, M.set,r.set,ini.method="EM", basis.method="bs",sl.v=r
   names(eigenv.sele)<-paste("eigenvalue",1:r.set[index.r])
   temp<-list("selected_model"=temp.model,"eigenfunctions"=eigenf.sele,"eigenvalues"=eigenv.sele,
              "error_var"=sig.sele^2,"fitted_mean"=fitmu,"grid"=grids.new,"cv_scores"=cv.result,
-             "converge"=con.result, "PVE"=PVE)
+             "converge"=con.result, "PVE"=PVE, "ddd"=result.c$ddd)
   
   return(temp)  
 }
@@ -252,7 +252,7 @@ fpca.fit<-function(M.set,r,data.list,n,nmax,grid.l=seq(0,1,0.01),grids=seq(0,1,0
       EMeigenvec.est<-eigenf.ini
       EMeigenval.est<-eigenv.ini
       EMsigma.est<-sqrt(sig2hat)
-      like.EM<-like.ini 
+      like.EM<-like.ini
     }
     
     
@@ -365,7 +365,7 @@ fpca.fit<-function(M.set,r,data.list,n,nmax,grid.l=seq(0,1,0.01),grids=seq(0,1,0
   ####(vii) return result
   result<-list("eigenval"=eigen.result,"sig"=sig.result,"-2*loglike"=like.result,
                "cv"=cv.result,"converge"=converge.result,"step"=step.result,"condition#"=cond.result,
-               "eigenvec"=eigenf.result, "PVE"=pve)
+               "eigenvec"=eigenf.result, "PVE"=pve, "ddd"=temp.EM[[5]])
   return(result)
 }
 

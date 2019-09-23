@@ -25,7 +25,8 @@ EM <- function(data.list,n,nmax,grids,M.EM,iter.num,r.EM,basis.EM,sig.EM){
   ## (a) formatting data for use in the EM routine
   data.obj <- Format.EM(data.list,n,nmax,grids) 
   ## (b) EM estimation of eigenfunctions (theta) and PC scores (alpha)
-  EMest <- fpcaEM(data.obj,k=r.EM,df=M.EM, grid = grids, maxit = iter.num, tol = 0.001, pert = 0.01, sigma = sig.EM^2,basis.EM,R.inv)
+  EMest <- fpcaEM(data.obj,k=r.EM,df=M.EM, grid = grids, maxit = iter.num, tol = 0.001, pert = 0.01, 
+                  sigma = sig.EM^2,basis.EM,R.inv)
 
   if(basis.EM=="ns"){
     B.basis <- cbind(1, ns(grids, df = M.EM)) ### spline basis (with constant) used in EM
@@ -55,7 +56,7 @@ EM <- function(data.list,n,nmax,grids,M.EM,iter.num,r.EM,basis.EM,sig.EM){
   ### first r.EM eigenvectors of Gamma
   #####EMeigenval.est <- EMgamma.svd$d[1:r.EM]/length(grids)
   
-  EMgamma.svd <- eigen(EMgamma,symmetric=TRUE)     ###use eigen with symmetric=TRUE
+  EMgamma.svd <- eigen(EMgamma, symmetric=TRUE)     ###use eigen with symmetric=TRUE
   ### first r.EM eigenvectors of Gamma
   EMeigenval.est <- EMgamma.svd$values[1:r.EM]/length(grids)
   ### first r.EM eigenvectors of Gamma
@@ -63,10 +64,13 @@ EM <- function(data.list,n,nmax,grids,M.EM,iter.num,r.EM,basis.EM,sig.EM){
   ### estimated eigenvalues
   EMsigma.est = sqrt(EMest$sigma)   ##estimated sigma
   
-  EMpve <- EMgamma.svd$values[1:r.EM] / sum(EMgamma.svd$values[EMgamma.svd$values > 0])   # PVE
+  # PVE 계산하기 위해 covriance matrix 계산 후 eigen decomposition
+  Gamma <- EMgamma + diag(rep(EMest$sigma, nrow(EMgamma)))
+  Gamma.eig <- eigen(Gamma)
+  EMpve <- Gamma.eig$values[1:r.EM] / sum(Gamma.eig$values[Gamma.eig$values > 0])   # PVE
 
   ##result
-  result<-list(EMeigenvec.est, EMeigenval.est, EMsigma.est, EMpve)
+  result<-list(EMeigenvec.est, EMeigenval.est, EMsigma.est, EMpve, EMgamma.svd$values)
   
   return(result)
 }
@@ -94,7 +98,8 @@ calclike <- function(y, sigma, Dinv, theta, B, curve){
 }
 
 ## computes the MLEs of alpha (PC score), theta (eigenfunctions represented in spline basis)
-fpcaEM <- function(obj, k = 2, df = 5, grid = seq(0.01, 1, length = 100), maxit = 50, tol = 0.001, pert = 0.01, sigma = 1, basis.method="ns",R.inv=NULL){
+fpcaEM <- function(obj, k = 2, df = 5, grid = seq(0.01, 1, length = 100), maxit = 50, tol = 0.001, 
+                   pert = 0.01, sigma = 1, basis.method="ns",R.inv=NULL){
   ### data represented as a single vector (by stacking the observations for different curves)
   y <- obj$y                 
   

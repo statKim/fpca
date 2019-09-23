@@ -43,7 +43,8 @@ fpca.score <- function(data.m, grids.u, muhat, eigenvals, eigenfuncs, sig2hat, K
     meastime <- data.u[(current+1):(current+m.l[i]),2]      # measurement times of the ith curve
     meastime2 <- tt[which(tt[,1] %in% meastime), 2]
     # round한 gridpoint와 timepoints를 비교해서(같은 것 여러개 나옴) 같은 것의 2번째 값 사용
-    gridtime <- apply(matrix(meastime), 1, function(x){ which( round(grids.u, interval) %in% x )[2] })   
+    # gridtime <- apply(matrix(meastime), 1, function(x){ which( round(grids.u, interval) %in% x )[2] })   
+    gridtime <- apply(matrix(meastime), 1, function(x){ ceiling(median(which( round(grids.u, interval) %in% x ))) }) 
     muy <- muhat[gridtime]
     Phiy  <- matrix(eigenfuncs.u[gridtime,1:K], ncol=K)
     Sigy <- Phiy %*% evalmat %*% t(Phiy) + sig2hat * diag(m.l[i])
