@@ -132,7 +132,7 @@ fpca.mle<-function(data.m, M.set,r.set,ini.method="EM", basis.method="bs",sl.v=r
   names(eigenv.sele)<-paste("eigenvalue",1:r.set[index.r])
   temp<-list("selected_model"=temp.model,"eigenfunctions"=eigenf.sele,"eigenvalues"=eigenv.sele,
              "error_var"=sig.sele^2,"fitted_mean"=fitmu,"grid"=grids.new,"cv_scores"=cv.result,
-             "converge"=con.result, "PVE"=PVE, "ddd"=result.c$ddd)
+             "converge"=con.result, "PVE"=PVE, "cov.mat"=result.c$ddd)
   
   return(temp)  
 }

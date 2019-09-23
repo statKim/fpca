@@ -70,7 +70,7 @@ EM <- function(data.list,n,nmax,grids,M.EM,iter.num,r.EM,basis.EM,sig.EM){
   EMpve <- Gamma.eig$values[1:r.EM] / sum(Gamma.eig$values[Gamma.eig$values > 0])   # PVE
 
   ##result
-  result<-list(EMeigenvec.est, EMeigenval.est, EMsigma.est, EMpve, EMgamma.svd$values)
+  result<-list(EMeigenvec.est, EMeigenval.est, EMsigma.est, EMpve, Gamma)
   
   return(result)
 }
